@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>library</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    width: 100%;
+    min-height: 100%;
+    background: #0d1014;
+    color: #e8ebee;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: none;
+  }
+
+  .app {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+    padding-top: max(40px, env(safe-area-inset-top));
+    padding-bottom: max(60px, env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  header {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .logo {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    color: #e8ebee;
+    line-height: 1;
+    text-transform: lowercase;
+  }
+
+  .search-wrap {
+    position: relative;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 16px 18px 16px 48px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 100px;
+    color: #e8ebee;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    outline: none;
+    transition: border-color 0.18s ease, background 0.18s ease;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .search-input::placeholder {
+    color: #5c6169;
+    font-weight: 400;
+  }
+
+  .search-input:focus {
+    border-color: rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    stroke: #5c6169;
+    stroke-width: 2.2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+    transition: stroke 0.18s ease;
+  }
+
+  .search-input:focus ~ .search-icon {
+    stroke: #e8ebee;
+  }
+
+  main {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  @media (min-width: 560px) {
+    main {
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+  }
+
+  .card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 22px 22px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 18px;
+    color: #e8ebee;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 68px;
+  }
+
+  .card:hover, .card:active {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .card.hidden {
+    display: none;
+  }
+
+  .card-title {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+    color: #e8ebee;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .card-title mark {
+    background: rgba(252, 192, 42, 0.25);
+    color: #fcc02a;
+    border-radius: 4px;
+    padding: 0 3px;
+  }
+
+  .card-arrow {
+    width: 15px;
+    height: 15px;
+    stroke: #5c6169;
+    stroke-width: 2.2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+    transition: stroke 0.18s ease, transform 0.18s ease;
+  }
+
+  .card:hover .card-arrow, .card:active .card-arrow {
+    stroke: #e8ebee;
+    transform: translateX(2px);
+  }
+
+  .empty {
+    grid-column: 1 / -1;
+    padding: 60px 20px;
+    text-align: center;
+    color: #5c6169;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+  }
+
+  .empty.hidden {
+    display: none;
+  }
+
+  footer {
+    text-align: center;
+    font-size: 11px;
+    color: #3a3f4a;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+    padding-top: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <div class="logo">library</div>
+    <div class="search-wrap">
+      <input
+        type="text"
+        id="searchInput"
+        class="search-input"
+        placeholder="suche..."
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+      >
+      <svg class="search-icon" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="7"></circle>
+        <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+      </svg>
+    </div>
+  </header>
+
+  <main id="cardsContainer">
+    <a class="card" data-title="Typing Challenge" href="https://orangeblacksquid.github.io/Luis/" target="_blank" rel="noopener">
+      <div class="card-title">Typing Challenge</div>
+      <svg class="card-arrow" viewBox="0 0 24 24">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="12 5 19 12 12 19"></polyline>
+      </svg>
+    </a>
+
+    <a class="card" data-title="Circles" href="https://orangeblacksquid.github.io/Circles/" target="_blank" rel="noopener">
+      <div class="card-title">Circles</div>
+      <svg class="card-arrow" viewBox="0 0 24 24">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="12 5 19 12 12 19"></polyline>
+      </svg>
+    </a>
+
+    <a class="card" data-title="Flappy Bird" href="https://orangeblacksquid.github.io/Flappy-Bird/" target="_blank" rel="noopener">
+      <div class="card-title">Flappy Bird</div>
+      <svg class="card-arrow" viewBox="0 0 24 24">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="12 5 19 12 12 19"></polyline>
+      </svg>
+    </a>
+
+    <a class="card" data-title="Coin Flip" href="https://orangeblacksquid.github.io/Coin-Flip/" target="_blank" rel="noopener">
+      <div class="card-title">Coin Flip</div>
+      <svg class="card-arrow" viewBox="0 0 24 24">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="12 5 19 12 12 19"></polyline>
+      </svg>
+    </a>
+
+    <a class="card" data-title="QR Code Generator" href="https://orangeblacksquid.github.io/QR-Code-Generator/" target="_blank" rel="noopener">
+      <div class="card-title">QR Code Generator</div>
+      <svg class="card-arrow" viewBox="0 0 24 24">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="12 5 19 12 12 19"></polyline>
+      </svg>
+    </a>
+
+    <div class="empty hidden" id="emptyState">nichts gefunden</div>
+  </main>
+
+  <footer>library</footer>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+const searchInput = document.getElementById('searchInput');
+const cards = Array.from(document.querySelectorAll('.card'));
+const emptyState = document.getElementById('emptyState');
+
+const cardData = cards.map(card => ({
+  element: card,
+  titleEl: card.querySelector('.card-title'),
+  originalTitle: card.dataset.title,
+  normalized: card.dataset.title.toLowerCase()
+}));
+
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function highlightMatch(title, query) {
+  if (!query) return escapeHtml(title);
+
+  const lowerTitle = title.toLowerCase();
+  const idx = lowerTitle.indexOf(query);
+
+  if (idx === -1) return escapeHtml(title);
+
+  const before = title.slice(0, idx);
+  const match = title.slice(idx, idx + query.length);
+  const after = title.slice(idx + query.length);
+
+  return escapeHtml(before) + '<mark>' + escapeHtml(match) + '</mark>' + escapeHtml(after);
+}
+
+function filter(query) {
+  const q = query.trim().toLowerCase();
+  let visible = 0;
+
+  for (const item of cardData) {
+    const matches = q === '' || item.normalized.indexOf(q) !== -1;
+
+    if (matches) {
+      item.element.classList.remove('hidden');
+      item.titleEl.innerHTML = highlightMatch(item.originalTitle, q);
+      visible++;
+    } else {
+      item.element.classList.add('hidden');
+      item.titleEl.textContent = item.originalTitle;
+    }
+  }
+
+  if (visible === 0) {
+    emptyState.classList.remove('hidden');
+  } else {
+    emptyState.classList.add('hidden');
+  }
+}
+
+let searchTimeout = null;
+
+searchInput.addEventListener('input', (e) => {
+  const value = e.target.value;
+
+  if (searchTimeout) clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => filter(value), 60);
+});
+
+searchInput.addEventListener('search', (e) => {
+  filter(e.target.value);
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === '/' && document.activeElement !== searchInput) {
+    e.preventDefault();
+    searchInput.focus();
+  }
+
+  if (e.key === 'Escape' && document.activeElement === searchInput) {
+    searchInput.value = '';
+    filter('');
+    searchInput.blur();
+  }
+});
+
+})();
+</script>
+</body>
+</html>
